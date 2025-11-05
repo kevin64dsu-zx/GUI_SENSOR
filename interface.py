@@ -7,7 +7,7 @@
 import streamlit as st
 import pandas as pd
 import time
-import requests   # <--- Importa requests pra consumir o endpoint
+import requests
 
 st.set_page_config(page_title="Monitor de Gases IoT", layout="wide")
 
@@ -15,25 +15,29 @@ st.set_page_config(page_title="Monitor de Gases IoT", layout="wide")
 st.title("💨 Monitor de Gases – IoT")
 st.write("""
 Sistema de monitoramento de gases perigosos.  
-As leituras abaixo vêm do **endpoint Flask (API local)**.
+As leituras abaixo vêm do **endpoint Flask (API em nuvem)**.
 """)
 
 # ==========================================================
-# 🛰️ Leitura via endpoint Flask
+# 🛰️ Leitura via endpoint Flask hospedado no Render
 # ==========================================================
 def ler_dados_sensor():
     try:
-        resposta = requests.get("http://127.0.0.1:5000/dados")  # <-- Endpoint Flask
+        # <-- Endpoint remoto
+        resposta = requests.get("https://end-point-c138.onrender.com/dados", timeout=10)
         if resposta.status_code == 200:
             return resposta.json()
         else:
-            st.error("Falha ao obter dados do endpoint Flask.")
+            st.error(f"Falha ao obter dados do endpoint (status {resposta.status_code}).")
             return {"CO": 0, "CH4": 0}
     except Exception as e:
-        st.error(f"Erro de conexão com o servidor Flask: {e}")
+        st.error(f"Erro de conexão com o servidor: {e}")
         return {"CO": 0, "CH4": 0}
 
 
+# ==========================================================
+# 🔊 Som de alerta
+# ==========================================================
 def emitir_som_alerta():
     sound_html = """
     <audio autoplay>
@@ -51,6 +55,9 @@ historico = []
 
 st.write("📡 Iniciando monitoramento em tempo real...")
 
+# ==========================================================
+# 🔁 Loop de atualização
+# ==========================================================
 for ciclo in range(100):
     dados = ler_dados_sensor()
     historico.append(dados)
@@ -59,7 +66,6 @@ for ciclo in range(100):
     with placeholder.container():
         col1.metric("CO (ppm)", dados["CO"])
         col2.metric("CH₄ (ppm)", dados["CH4"])
-
         st.line_chart(df)
 
         if dados["CO"] > 80 or dados["CH4"] > 150:
