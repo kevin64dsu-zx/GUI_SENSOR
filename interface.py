@@ -1,8 +1,8 @@
-# ==========================================================
+
 # 🌡️ PROJETO IoT – MONITOR DE GASES
 # Autor: Grupo 3 Kevin (Fatec)
 # Objetivo: Monitorar níveis de CO e CH₄ em tempo real com alertas visuais e sonoros
-# ==========================================================
+
 
 import streamlit as st
 import pandas as pd
@@ -11,16 +11,16 @@ import requests
 
 st.set_page_config(page_title="Monitor de Gases IoT", layout="wide")
 
-# --- Cabeçalho da aplicação ---
+
 st.title("💨 Monitor de Gases – IoT")
 st.write("""
 Sistema de monitoramento de gases perigosos.  
 As leituras abaixo vêm do **endpoint Flask (API em nuvem)**.
 """)
 
-# ==========================================================
+
 # 🛰️ Leitura via endpoint Flask hospedado no Render
-# ==========================================================
+
 def ler_dados_sensor():
     try:
         # <-- Endpoint remoto
@@ -35,7 +35,7 @@ def ler_dados_sensor():
         return {"CO": 0, "CH4": 0}
 
 
-# ==========================================================
+
 # 🔊 Som de alerta
 # ==========================================================
 def emitir_som_alerta():
